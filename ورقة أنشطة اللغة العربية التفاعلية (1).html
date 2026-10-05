@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ورقة الأنشطة التفاعلية الشاملة - مدرسة القلم التعليمية الخاصة</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #fef3c7 50%, #fbcfe8 100%);
+            background-attachment: fixed;
+        }
+        .bounce-hover {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .bounce-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px -2px rgba(0, 0, 0, 0.08);
+        }
+        .balloon-option {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .balloon-option:hover {
+            transform: scale(1.03);
+        }
+        .balloon-option.selected {
+            border-color: #4f46e5 !important;
+            background-color: #e0e7ff !important;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
+            transform: scale(1.04);
+        }
+        /* مؤشرات التقييم النهائي فقط عند التصحيح */
+        .ans-correct {
+            border-color: #10b981 !important;
+            background-color: #ecfdf5 !important;
+        }
+        .ans-wrong {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background: white !important;
+            }
+            .page-container {
+                box-shadow: none !important;
+                border: none !important;
+                margin: 0 !important;
+                padding: 10px !important;
+                max-width: 100% !important;
+            }
+            .activity-card {
+                break-inside: avoid;
+                box-shadow: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="p-2 sm:p-6 min-h-screen">
+
+    <div class="max-w-5xl mx-auto bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border-4 border-indigo-200 p-4 sm:p-8 page-container relative overflow-hidden">
+        
+        <!-- خلفية جمالية مبهجة -->
+        <div class="absolute -top-12 -right-12 w-48 h-48 bg-yellow-300 rounded-full opacity-30 blur-2xl pointer-events-none"></div>
+        <div class="absolute -bottom-12 -left-12 w-48 h-48 bg-pink-300 rounded-full opacity-30 blur-2xl pointer-events-none"></div>
+
+        <!-- الترويسة الرئيسية -->
+        <header class="border-b-4 border-dashed border-indigo-200 pb-5 mb-6">
+            <div class="flex flex-wrap justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-16 h-16 bg-gradient-to-tr from-indigo-600 to-purple-600 text-white rounded-2xl flex items-center justify-center text-3xl shadow-lg transform -rotate-3 hover:rotate-0 transition-transform">
+                        ✏
+                    </div>
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-black text-indigo-950">مدرسة القلم التّعليميّة الخاصّة</h1>
+                        <p class="text-sm font-bold text-indigo-600 flex items-center gap-1">
+                            <span>ورقة أنشطة اللغة العربية التقييمية (متعددة المستويات)</span>
+                            <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-extrabold">10 أنشطة شاملة</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- لوحة النتيجة ومفتاح الصوت -->
+                <div class="flex items-center gap-3">
+                    <button id="soundToggleBtn" onclick="toggleSound()" class="no-print bg-indigo-100 hover:bg-indigo-200 text-indigo-800 p-3 rounded-2xl border-2 border-indigo-300 flex items-center gap-2 font-bold text-xs transition" title="تشغيل/إيقاف المؤثرات الصوتية">
+                        <span id="soundIcon" class="text-lg">🔊</span>
+                        <span id="soundStatus" class="hidden sm:inline">الصوت مفعل</span>
+                    </button>
+
+                    <div class="bg-gradient-to-br from-amber-100 to-amber-200 border-2 border-amber-400 rounded-2xl p-3 text-center min-w-[140px] shadow-sm">
+                        <span class="block text-xs font-black text-amber-900">الدرجة الكلية</span>
+                        <span class="text-2xl font-black text-amber-800"><span id="currentScoreDisplay" class="text-indigo-900 font-black">--</span> / 60</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- معلومات الطالب والمعلمة -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4 bg-indigo-50/80 p-3.5 rounded-2xl border border-indigo-100 text-sm font-bold text-indigo-900">
+                <div class="flex items-center gap-2">
+                    <span class="text-indigo-600 font-extrabold">اسم الطالب/ـة:</span>
+                    <input type="text" placeholder="اكتب اسمك هنا..." class="bg-white/80 border-b-2 border-indigo-300 focus:border-indigo-600 focus:outline-none px-2 py-1 rounded-md flex-grow text-indigo-900 font-bold">
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-indigo-600 font-extrabold">الصف:</span>
+                    <input type="text" placeholder="الأول / أ" class="bg-white/80 border-b-2 border-indigo-300 focus:border-indigo-600 focus:outline-none px-2 py-1 rounded-md w-24 text-indigo-900 font-bold text-center">
+                </div>
+                <div class="flex items-center gap-2 justify-start sm:justify-end">
+                    <span class="text-indigo-600 font-extrabold">إشراف المعلمة:</span>
+                    <span class="bg-pink-100 text-pink-700 px-3 py-1 rounded-xl border border-pink-300 text-xs font-black shadow-sm flex items-center gap-1">
+                        <span>ياسمين الحمادي</span> 🌸
+                    </span>
+                </div>
+            </div>
+            
+            <div class="mt-3 bg-amber-50 border border-amber-200 text-amber-900 text-xs font-extrabold p-2.5 rounded-xl flex items-center gap-2">
+                <span>📌</span>
+                <span>تنبيه: أجب عن جميع الأسئلة بتركيز. لن تظهر الإجابات الصحيحة والخاطئة إلا بعد الضغط على زر "تصحيح الورقة" في نهاية الصفحة.</span>
+            </div>
+        </header>
+
+        <!-- الأنشطة العشرة مقسمة حسب المستويات الثلاثة (المجموع الكلي: 60 درجة) -->
+        <div class="space-y-8">
+
+            <!-- ======================= المستوى الأول: السهل (🟢 المبتدئ) ======================= -->
+            <div class="space-y-4">
+                <div class="flex items-center gap-2 bg-emerald-100/90 text-emerald-950 p-3 rounded-2xl border-2 border-emerald-300 shadow-sm">
+                    <span class="bg-emerald-600 text-white text-xs font-black px-3 py-1 rounded-xl">المستوى الأول</span>
+                    <h2 class="font-black text-base sm:text-lg">🌱 المهارات الأساسية (السهل) — [20 درجة]</h2>
+                </div>
+
+                <!-- النشاط 1: تمييز أنواع المدود (6 درجات) -->
+                <section class="activity-card bg-emerald-50/50 border-2 border-emerald-200 rounded-2xl p-4 bounce-hover">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm sm:text-base font-black text-emerald-950 flex items-center gap-2">
+                            <span class="bg-emerald-500 text-white w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black">١</span>
+                            النشاط الأول: حدد نوع الصوت أو المد في الكلمات (3 فقرات × 2 درجة)
+                        </h3>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                        <div id="box_q1_1" class="bg-white p-3 rounded-xl border border-emerald-200 flex flex-col gap-2 shadow-sm">
+                            <div class="flex justify-between items-center">
+                                <span class="font-black text-gray-800 text-base">1. كِـتَــابٌ</span>
+                                <button onclick="speakText('كتاب')" class="no-print text-emerald-600 text-xs">🔊 استمع</button>
+                            </div>
+                            <select id="q1_1" class="border-2 border-emerald-200 rounded-xl p-1.5 text-xs font-bold text-emerald-900 bg-emerald-50">
+                                <option value="">اختر نوع المد...</option>
+                                <option value="long_a">مد بالألف</option>
+                                <option value="long_w">مد بالواو</option>
+                                <option value="short">حركة قصيرة</option>
+                            </select>
+                            <span id="badge_q1_1" class="text-xs font-bold"></span>
+                        </div>
+
+                        <div id="box_q1_2" class="bg-white p-3 rounded-xl border border-emerald-200 flex flex-col gap-2 shadow-sm">
+                            <div class="flex justify-between items-center">
+                                <span class="font-black text-gray-800 text-base">2. لَــعِــبَ</span>
+                                <button onclick="speakText('لعب')" class="no-print text-emerald-600 text-xs">🔊 استمع</button>
+                            </div>
+                            <select id="q1_2" class="border-2 border-emerald-200 rounded-xl p-1.5 text-xs font-bold text-emerald-900 bg-emerald-50">
+                                <option value="">اختر نوع المد...</option>
+                                <option value="long_y">مد بالياء</option>
+                                <option value="short">حركات قصيرة</option>
+                                <option value="long_a">مد بالألف</option>
+                            </select>
+                            <span id="badge_q1_2" class="text-xs font-bold"></span>
+                        </div>
+
+                        <div id="box_q1_3" class="bg-white p-3 rounded-xl border border-emerald-200 flex flex-col gap-2 shadow-sm">
+                            <div class="flex justify-between items-center">
+                                <span class="font-black text-gray-800 text-base">3. عُــصْــفُــورٌ</span>
+                                <button onclick="speakText('عصفور')" class="no-print text-emerald-600 text-xs">🔊 استمع</button>
+                            </div>
+                            <select id="q1_3" class="border-2 border-emerald-200 rounded-xl p-1.5 text-xs font-bold text-emerald-900 bg-emerald-50">
+                                <option value="">اختر نوع المد...</option>
+                                <option value="long_w">مد بالواو</option>
+                                <option value="long_y">مد بالياء</option>
+                                <option value="short">حركة قصيرة</option>
+                            </select>
+                            <span id="badge_q1_3" class="text-xs font-bold"></span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- النشاط 2: كاشف التنوين (6 درجات) -->
+                <section class="activity-card bg-emerald-50/50 border-2 border-emerald-200 rounded-2xl p-4 bounce-hover">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm sm:text-base font-black text-emerald-950 flex items-center gap-2">
+                            <span class="bg-emerald-500 text-white w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black">٢</span>
+                            النشاط الثاني: اختر الرسم الإملائي الصحيح للتنوين (3 فقرات × 2 درجة)
+                        </h3>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                        <div id="box_q2_1" class="bg-white p-3 rounded-xl border border-emerald-200 flex flex-col gap-2 shadow-sm">
+                            <span class="font-bold text-gray-800">1. تنوين فتح لكلمة (قَلَم):</span>
+                            <select id="q2_1" class="border-2 border-emerald-200 rounded-xl p-1.5 text-xs font-bold text-emerald-900 bg-emerald-50">
+                                <option value="">اختر الإجابة...</option>
+                                <option value="right">قَلَمًا</option>
+                                <option value="wrong1">قلمن</option>
+                                <option value="wrong2">قلمٌ</option>
+                            </select>
+                            <span id="badge_q2_1" class="text-xs font-bold"></span>
+                        </div>
+
+                        <div id="box_q2_2" class="bg-white p-3 rounded-xl border border-emerald-200 flex flex-col gap-2 shadow-sm">
+                            <span class="font-bold text-gray-800">2. تنوين ضم لكلمة (وَلَد):</span>
+                            <select id="q2_2" class="border-2 border-emerald-200 rounded-xl p-1.5 text-xs font-bold text-emerald-900 bg-emerald-50">
+                                <option value="">اختر الإجابة...</option>
+                                <option value="wrong1">ولدن</option>
+                                <option value="right">وَلَدٌ</option>
+                                <option value="wrong2">ولدو</option>
+                            </select>
+                            <span id="badge_q2_2" class="text-xs font-bold"></span>
+                        </div>
+
+                        <div id="box_q2_3" class="bg-white p-3 rounded-xl border border-emerald-200 flex flex-col gap-2 shadow-sm">
+                            <span class="font-bold text-gray-800">3. تنوين فتح لكلمة (سَمَاء):</span>
+                            <select id="q2_3" class="border-2 border-emerald-200 rounded-xl p-1.5 text-xs font-bold text-emerald-900 bg-emerald-50">
+                                <option value="">اختر الإجابة...</option>
+                                <option value="right">سَمَاءً</option>
+                                <option value="wrong1">سماءن</option>
+                                <option value="wrong2">سماءًا</option>
+                            </select>
+                            <span id="badge_q2_3" class="text-xs font-bold"></span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- النشاط 3: التاء المربوطة والمبسوطة المباشرة (8 درجات) -->
+                <section class="activity-card bg-emerald-50/50 border-2 border-emerald-200 rounded-2xl p-4 bounce-hover">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm sm:text-base font-black text-emerald-950 flex items-center gap-2">
+                            <span class="bg-emerald-500 text-white w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black">٣</span>
+                            النشاط الثالث: حدد نوع التاء المناسبة بآخر الكلمة (4 فقرات × 2 درجة)
+                        </h3>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                        <div id="box_q3_1" class="bg-white p-3 rounded-xl border border-emerald-200 flex items-center justify-between">
+                            <span class="font-bold text-gray-800">1. مَـدْرَسَــ...</span>
+                            <select id="q3_1" class="border-2 border-emerald-200 rounded-xl p-1.5 text-xs font-bold text-emerald-900 bg-emerald-50">
+                                <option value="">اختر الحرف...</option>
+                                <option value="right">ـة (مربوطة)</option>
+                                <option value="wrong">ـت (مبسوطة)</option>
+                            </select>
+                            <span id="badge_q3_1" class="text-xs font-bold"></span>
+                        </div>
+
+                        <div id="box_q3_2" class="bg-white p-3 rounded-xl border border-emerald-200 flex items-center justify-between">
+                            <span class="font-bold text-gray-800">2. بَــيْــ...</span>
+                            <select id="q3_2" class="border-2 border-emerald-200 rounded-xl p-1.5 text-xs font-bold text-emerald-900 bg-emerald-50">
+                                <option value="">اختر الحرف...</option>
+                                <option value="right">ت (مبسوطة)</option>
+                                <option value="wrong">ة (مربوطة)</option>
+                            </select>
+                            <span id="badge_q3_2" class="text-xs font-bold"></span>
+                        </div>
+
+                        <div id="box_q3_3" class="bg-white p-3 rounded-xl border border-emerald-200 flex items-center justify-between">
+                            <span class="font-bold text-gray-800">3. زَهْــرَ... جَمِيلَةٌ</span>
+                            <select id="q3_3" class="border-2 border-emerald-200 rounded-xl p-1.5 text-xs font-bold text-emerald-900 bg-emerald-50">
+                                <option value="">اختر الحرف...</option>
+                                <option value="right">ة (مربوطة)</option>
+                                <option value="wrong">ت (مبسوطة)</option>
+                            </select>
+                            <span id="badge_q3_3" class="text-xs font-bold"></span>
+                        </div>
+
+                        <div id="box_q3_4" class="bg-white p-3 rounded-xl border border-emerald-200 flex items-center justify-between">
+                            <span class="font-bold text-gray-800">4. بَــنَــا... المَدْرَسَةِ</span>
+                            <select id="q3_4" class="border-2 border-emerald-200 rounded-xl p-1.5 text-xs font-bold text-emerald-900 bg-emerald-50">
+                                <option value="">اختر الحرف...</option>
+                                <option value="right">ت (مبسوطة)</option>
+                                <option value="wrong">ة (مربوطة)</option>
+                            </select>
+                            <span id="badge_q3_4" class="text-xs font-bold"></span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+
+            <!-- ======================= المستوى الثاني: المتوسط (🔵 المتمكن) ======================= -->
+            <div class="space-y-4">
+                <div class="flex items-center gap-2 bg-sky-100/90 text-sky-950 p-3 rounded-2xl border-2 border-sky-300 shadow-sm">
+                    <span class="bg-sky-600 text-white text-xs font-black px-3 py-1 rounded-xl">المستوى الثاني</span>
+                    <h2 class="font-black text-base sm:text-lg">🌊 التراكيب والقواعد (المتوسط) — [20 درجة]</h2>
+                </div>
+
+                <!-- النشاط 4: اللام الشمسية واللام القمرية (6 درجات) -->
+                <section class="activity-card bg-sky-50/50 border-2 border-sky-200 rounded-2xl p-4 bounce-hover">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm sm:text-base font-black text-sky-950 flex items-center gap-2">
+                            <span class="bg-sky-500 text-white w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black">٤</span>
+                            النشاط الرابع: ميز نوع (الـ) التعريف في الكلمات (3 فقرات × 2 درجة)
+                        </h3>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                        <div id="box_q4_1" class="bg-white p-3 rounded-xl border border-sky-200 flex flex-col gap-2 shadow-sm">
+                            <span class="font-black text-gray-800 text-base">1. الشَّـمْـسُ</span>
+                            <select id="q4_1" class="border-2 border-sky-200 rounded-xl p-1.5 text-xs font-bold text-sky-900 bg-sky-50">
+                                <option value="">اختر نوع اللام...</option>
+                                <option value="sun">لام شمسية (تُكتب ولا تُلفظ)</option>
+                                <option value="moon">لام قمرية (تُكتب وتُلفظ)</option>
+                            </select>
+                            <span id="badge_q4_1" class="text-xs font-bold"></span>
+                        </div>
+
+                        <div id="box_q4_2" class="bg-white p-3 rounded-xl border border-sky-200 flex flex-col gap-2 shadow-sm">
+                            <span class="font-black text-gray-800 text-base">2. القَــمَــرُ</span>
+                            <select id="q4_2" class="border-2 border-sky-200 rounded-xl p-1.5 text-xs font-bold text-sky-900 bg-sky-50">
+                                <option value="">اختر نوع اللام...</option>
+                                <option value="moon">لام قمرية (تُكتب وتُلفظ)</option>
+                                <option value="sun">لام شمسية (تُكتب ولا تُلفظ)</option>
+                            </select>
+                            <span id="badge_q4_2" class="text-xs font-bold"></span>
+                        </div>
+
+                        <div id="box_q4_3" class="bg-white p-3 rounded-xl border border-sky-200 flex flex-col gap-2 shadow-sm">
+                            <span class="font-black text-gray-800 text-base">3. التَّــلَــامِــيــذُ</span>
+                            <select id="q4_3" class="border-2 border-sky-200 rounded-xl p-1.5 text-xs font-bold text-sky-900 bg-sky-50">
+                                <option value="">اختر نوع اللام...</option>
+                                <option value="sun">لام شمسية</option>
+                                <option value="moon">لام قمرية</option>
+                            </select>
+                            <span id="badge_q4_3" class="text-xs font-bold"></span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- النشاط 5: حروف الجر المناسبة (8 درجات) -->
+                <section class="activity-card bg-sky-50/50 border-2 border-sky-200 rounded-2xl p-4 bounce-hover">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm sm:text-base font-black text-sky-950 flex items-center gap-2">
+                            <span class="bg-sky-500 text-white w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black">٥</span>
+                            النشاط الخامس: أكمل الجمل بحرف الجر المناسب (4 فقرات × 2 درجة)
+                        </h3>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                        <div id="box_q5_1" class="bg-white p-3 rounded-xl border border-sky-200 flex items-center justify-between gap-2 shadow-sm">
+                            <span class="font-bold text-gray-800">1. ذَهَبَ الطَّالِبُ ... المَدْرَسَةِ.</span>
+                            <select id="q5_1" class="border-2 border-sky-200 rounded-xl p-1 text-xs font-bold text-sky-900 bg-sky-50">
+                                <option value="">اختر...</option>
+                                <option value="to">إِلَى</option>
+                                <option value="in">فِي</option>
+                                <option value="from">مِنْ</option>
+                            </select>
+                            <span id="badge_q5_1" class="text-xs font-bold"></span>
+                        </div>
+
+                        <div id="box_q5_2" class="bg-white p-3 rounded-xl border border-sky-200 flex items-center justify-between gap-2 shadow-sm">
+                            <span class="font-bold text-gray-800">2. النَّظَافَةُ ... الإِيمَانِ.</span>
+                            <select id="q5_2" class="border-2 border-sky-200 rounded-xl p-1 text-xs font-bold text-sky-900 bg-sky-50">
+                                <option value="">اختر...</option>
+                                <option value="from">مِنْ</option>
+                                <option value="on">عَلَى</option>
+                                <option value="in">فِي</option>
+                            </select>
+                            <span id="badge_q5_2" class="text-xs font-bold"></span>
+                        </div>
+
+                        <div id="box_q5_3" class="bg-white p-3 rounded-xl border border-sky-200 flex items-center justify-between gap-2 shadow-sm">
+                            <span class="font-bold text-gray-800">3. الكِتَابُ ... الطَّاوِلَةِ.</span>
+                            <select id="q5_3" class="border-2 border-sky-200 rounded-xl p-1 text-xs font-bold text-sky-900 bg-sky-50">
+                                <option value="">اختر...</option>
+                                <option value="on">عَلَى</option>
+                                <option value="to">إِلَى</option>
+                                <option value="with">بِـ</option>
+                            </select>
+                            <span id="badge_q5_3" class="text-xs font-bold"></span>
+                        </div>
+
+                        <div id="box_q5_4" class="bg-white p-3 rounded-xl border border-sky-200 flex items-center justify-between gap-2 shadow-sm">
+                            <span class="font-bold text-gray-800">4. يَعِيشُ السَّمَكُ ... المَاءِ.</span>
+                            <select id="q5_4" class="border-2 border-sky-200 rounded-xl p-1 text-xs font-bold text-sky-900 bg-sky-50">
+                                <option value="">اختر...</option>
+                                <option value="in">فِي</option>
+                                <option value="from">مِنْ</option>
+                                <option value="on">عَلَى</option>
+                            </select>
+                            <span id="badge_q5_4" class="text-xs font-bold"></span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- النشاط 6: صيد البالونات الذكي (6 درجات) -->
+                <section class="activity-card bg-sky-50/50 border-2 border-sky-200 rounded-2xl p-4 bounce-hover">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm sm:text-base font-black text-sky-950 flex items-center gap-2">
+                            <span class="bg-sky-500 text-white w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black">٦</span>
+                            النشاط السادس: انقر لتحديد البالون المناسب (3 فقرات × 2 درجة)
+                        </h3>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                        <div id="box_balloon_1" class="bg-white p-3 rounded-xl border border-sky-200 shadow-sm flex flex-col justify-between">
+                            <p class="font-bold text-gray-800 mb-2">1. كلمة تحوي (مد بالواو):</p>
+                            <div class="flex flex-col gap-1.5" id="balloonGroup1">
+                                <button type="button" onclick="selectBalloon(1, 'wrong', this)" class="balloon-option bg-amber-100 border-2 border-amber-300 text-amber-900 px-3 py-1.5 rounded-2xl font-bold text-xs">🎈 وَرْدَةٌ</button>
+                                <button type="button" onclick="selectBalloon(1, 'right', this)" class="balloon-option bg-rose-100 border-2 border-rose-300 text-rose-900 px-3 py-1.5 rounded-2xl font-bold text-xs">🎈 عُصْفُورٌ</button>
+                            </div>
+                            <span id="badge_balloon_1" class="text-xs font-bold mt-2"></span>
+                        </div>
+
+                        <div id="box_balloon_2" class="bg-white p-3 rounded-xl border border-sky-200 shadow-sm flex flex-col justify-between">
+                            <p class="font-bold text-gray-800 mb-2">2. شبه جملة تبدأ بحرف جر:</p>
+                            <div class="flex flex-col gap-1.5" id="balloonGroup2">
+                                <button type="button" onclick="selectBalloon(2, 'right', this)" class="balloon-option bg-purple-100 border-2 border-purple-300 text-purple-900 px-3 py-1.5 rounded-2xl font-bold text-xs">🎈 فِي المَدْرَسَةِ</button>
+                                <button type="button" onclick="selectBalloon(2, 'wrong', this)" class="balloon-option bg-blue-100 border-2 border-blue-300 text-blue-900 px-3 py-1.5 rounded-2xl font-bold text-xs">🎈 العِلْمُ نُورٌ</button>
+                            </div>
+                            <span id="badge_balloon_2" class="text-xs font-bold mt-2"></span>
+                        </div>
+
+                        <div id="box_balloon_3" class="bg-white p-3 rounded-xl border border-sky-200 shadow-sm flex flex-col justify-between">
+                            <p class="font-bold text-gray-800 mb-2">3. التنوين الصحيح للفتح:</p>
+                            <div class="flex flex-col gap-1.5" id="balloonGroup3">
+                                <button type="button" onclick="selectBalloon(3, 'right', this)" class="balloon-option bg-emerald-100 border-2 border-emerald-300 text-emerald-900 px-3 py-1.5 rounded-2xl font-bold text-xs">🎈 مَدْرَسَةً</button>
+                                <button type="button" onclick="selectBalloon(3, 'wrong', this)" class="balloon-option bg-orange-100 border-2 border-orange-300 text-orange-900 px-3 py-1.5 rounded-2xl font-bold text-xs">🎈 مدرسةن</button>
+                            </div>
+                            <span id="badge_balloon_3" class="text-xs font-bold mt-2"></span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+
+            <!-- ======================= المستوى الثالث: المتقدم (🟣 التحدي) ======================= -->
+            <div class="space-y-4">
+                <div class="flex items-center gap-2 bg-purple-100/90 text-purple-950 p-3 rounded-2xl border-2 border-purple-300 shadow-sm">
+                    <span class="bg-purple-600 text-white text-xs font-black px-3 py-1 rounded-xl">المستوى الثالث</span>
+                    <h2 class="font-black text-base sm:text-lg">🔥 مهارات بطل لغتي المتمكن (المتقدم) — [20 درجة]</h2>
+                </div>
+
+                <!-- النشاط 7: كاشف الأخطاء الإملائية (6 درجات) -->
+                <section class="activity-card bg-purple-50/50 border-2 border-purple-200 rounded-2xl p-4 bounce-hover">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm sm:text-base font-black text-purple-950 flex items-center gap-2">
+                            <span class="bg-purple-600 text-white w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black">٧</span>
+                            النشاط السابع: حدد التصحيح الإملائي للكلمة المكتوبة بشكل خاطئ (3 فقرات × 2 درجة)
+                        </h3>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                        <div id="box_q7_1" class="bg-white p-3 rounded-xl border border-purple-200 flex flex-col gap-2 shadow-sm">
+                            <span class="font-bold text-gray-800">1. تصحيح الخطأ في (بَيْتَه):</span>
+                            <select id="q7_1" class="border-2 border-purple-200 rounded-xl p-1.5 text-xs font-bold text-purple-900 bg-purple-50">
+                                <option value="">اختر الصواب...</option>
+                                <option value="right">بَــيْــتٌ (مبسطة)</option>
+                                <option value="wrong">بيته (بالهاء)</option>
+                            </select>
+                            <span id="badge_q7_1" class="text-xs font-bold"></span>
+                        </div>
+
+                        <div id="box_q7_2" class="bg-white p-3 rounded-xl border border-purple-200 flex flex-col gap-2 shadow-sm">
+                            <span class="font-bold text-gray-800">2. تصحيح الخطأ في (سُمُوك):</span>
+                            <select id="q7_2" class="border-2 border-purple-200 rounded-xl p-1.5 text-xs font-bold text-purple-900 bg-purple-50">
+                                <option value="">اختر الصواب...</option>
+                                <option value="wrong">سُمُوك (مد واو)</option>
+                                <option value="right">سَــمَــكٌ (حركات قصيرة)</option>
+                            </select>
+                            <span id="badge_q7_2" class="text-xs font-bold"></span>
+                        </div>
+
+                        <div id="box_q7_3" class="bg-white p-3 rounded-xl border border-purple-200 flex flex-col gap-2 shadow-sm">
+                            <span class="font-bold text-gray-800">3. تصحيح الخطأ في (شُكْرَنْ):</span>
+                            <select id="q7_3" class="border-2 border-purple-200 rounded-xl p-1.5 text-xs font-bold text-purple-900 bg-purple-50">
+                                <option value="">اختر الصواب...</option>
+                                <option value="right">شُــكْــرًا (تنوين فتح)</option>
+                                <option value="wrong">شكرن (نون ساطعة)</option>
+                            </select>
+                            <span id="badge_q7_3" class="text-xs font-bold"></span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- النشاط 8: التحليل الصوتي والقطاعي (4 درجات) -->
+                <section class="activity-card bg-purple-50/50 border-2 border-purple-200 rounded-2xl p-4 bounce-hover">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm sm:text-base font-black text-purple-950 flex items-center gap-2">
+                            <span class="bg-purple-600 text-white w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black">٨</span>
+                            النشاط الثامن: التحليل الصوتي للكلمات إلى مقاطع (فقرتان × 2 درجة)
+                        </h3>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                        <div id="box_q8_1" class="bg-white p-3 rounded-xl border border-purple-200 flex flex-col gap-2 shadow-sm">
+                            <span class="font-bold text-gray-800">1. التحليل الصحيح لكلمة (مَـدْرَسَـةٌ):</span>
+                            <select id="q8_1" class="border-2 border-purple-200 rounded-xl p-1.5 text-xs font-bold text-purple-900 bg-purple-50">
+                                <option value="">اختر المقاطع...</option>
+                                <option value="right">مَدْ / رَ / سَ / ةٌ</option>
+                                <option value="wrong1">مَ / دْ / رَ / سَةٌ</option>
+                                <option value="wrong2">مدر / سة</option>
+                            </select>
+                            <span id="badge_q8_1" class="text-xs font-bold"></span>
+                        </div>
+
+                        <div id="box_q8_2" class="bg-white p-3 rounded-xl border border-purple-200 flex flex-col gap-2 shadow-sm">
+                            <span class="font-bold text-gray-800">2. التحليل الصحيح لكلمة (مَـحْـمُـودٌ):</span>
+                            <select id="q8_2" class="border-2 border-purple-200 rounded-xl p-1.5 text-xs font-bold text-purple-900 bg-purple-50">
+                                <option value="">اختر المقاطع...</option>
+                                <option value="right">مَحْ / مُو / دٌ</option>
+                                <option value="wrong1">مَ / حْ / مـُ / و / دٌ</option>
+                                <option value="wrong2">محـ / مودٌ</option>
+                            </select>
+                            <span id="badge_q8_2" class="text-xs font-bold"></span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- النشاط 9: التمييز بين الهاء والتاء المربوطة (4 درجات) -->
+                <section class="activity-card bg-purple-50/50 border-2 border-purple-200 rounded-2xl p-4 bounce-hover">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm sm:text-base font-black text-purple-950 flex items-center gap-2">
+                            <span class="bg-purple-600 text-white w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black">٩</span>
+                            النشاط التاسع: التمييز الدقيق بين الهاء (ـه/ه) والتاء المربوطة (ـة/ة) (فقرتان × 2 درجة)
+                        </h3>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                        <div id="box_q9_1" class="bg-white p-3 rounded-xl border border-purple-200 flex items-center justify-between gap-2 shadow-sm">
+                            <span class="font-bold text-gray-800">1. وَجْــ... (تُنطق هاء عند الوصل والوقف)</span>
+                            <select id="q9_1" class="border-2 border-purple-200 rounded-xl p-1.5 text-xs font-bold text-purple-900 bg-purple-50">
+                                <option value="">اختر...</option>
+                                <option value="right">ـه (هاء)</option>
+                                <option value="wrong">ـة (تاء مربوطة)</option>
+                            </select>
+                            <span id="badge_q9_1" class="text-xs font-bold"></span>
+                        </div>
+
+                        <div id="box_q9_2" class="bg-white p-3 rounded-xl border border-purple-200 flex items-center justify-between gap-2 shadow-sm">
+                            <span class="font-bold text-gray-800">2. مِــيــا... (تُنطق هاء عند الوصل والوقف)</span>
+                            <select id="q9_2" class="border-2 border-purple-200 rounded-xl p-1.5 text-xs font-bold text-purple-900 bg-purple-50">
+                                <option value="">اختر...</option>
+                                <option value="right">ه (هاء)</option>
+                                <option value="wrong">ة (تاء مربوطة)</option>
+                            </select>
+                            <span id="badge_q9_2" class="text-xs font-bold"></span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- النشاط 10: تركيب وإكمال الجملة الصحيحة (6 درجات) -->
+                <section class="activity-card bg-purple-50/50 border-2 border-purple-200 rounded-2xl p-4 bounce-hover">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm sm:text-base font-black text-purple-950 flex items-center gap-2">
+                            <span class="bg-purple-600 text-white w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black">١٠</span>
+                            النشاط العاشر: تركيب واختيار الجمل الصحيحة قواعدياً (3 فقرات × 2 درجة)
+                        </h3>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                        <div id="box_q10_1" class="bg-white p-3 rounded-xl border border-purple-200 flex flex-col gap-2 shadow-sm">
+                            <span class="font-bold text-gray-800">1. الكلمة التي تمثل اسماً مجروراً:</span>
+                            <select id="q10_1" class="border-2 border-purple-200 rounded-xl p-1.5 text-xs font-bold text-purple-900 bg-purple-50">
+                                <option value="">اختر الكلمة...</option>
+                                <option value="right">المَلْعَبِ (في فِي المَلْعَبِ)</option>
+                                <option value="wrong">فِي</option>
+                            </select>
+                            <span id="badge_q10_1" class="text-xs font-bold"></span>
+                        </div>
+
+                        <div id="box_q10_2" class="bg-white p-3 rounded-xl border border-purple-200 flex flex-col gap-2 shadow-sm">
+                            <span class="font-bold text-gray-800">2. حرف المد في كلمة (طَـبِـيـبٌ):</span>
+                            <select id="q10_2" class="border-2 border-purple-200 rounded-xl p-1.5 text-xs font-bold text-purple-900 bg-purple-50">
+                                <option value="">اختر الحرف...</option>
+                                <option value="right">الياء (ي)</option>
+                                <option value="wrong">الباء (ب)</option>
+                            </select>
+                            <span id="badge_q10_2" class="text-xs font-bold"></span>
+                        </div>
+
+                        <div id="box_q10_3" class="bg-white p-3 rounded-xl border border-purple-200 flex flex-col gap-2 shadow-sm">
+                            <span class="font-bold text-gray-800">3. النون بآخر كلمة (زَمَـنٌ) هي:</span>
+                            <select id="q10_3" class="border-2 border-purple-200 rounded-xl p-1.5 text-xs font-bold text-purple-900 bg-purple-50">
+                                <option value="">اختر...</option>
+                                <option value="right">نون أصلية بالكلمة</option>
+                                <option value="wrong">تنوين فقط</option>
+                            </select>
+                            <span id="badge_q10_3" class="text-xs font-bold"></span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+
+        <!-- أزرار التحكم والتصحيح النهائي والطباعة -->
+        <div class="no-print mt-8 flex flex-wrap justify-center gap-4">
+            <button onclick="calculateGrade()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black py-3.5 px-8 rounded-2xl shadow-xl transition transform hover:scale-105 flex items-center gap-2 text-base">
+                <span>✅</span> تصحيح الورقة واكتشاف الإجابات
+            </button>
+            <button onclick="resetForm()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3.5 px-6 rounded-2xl shadow transition flex items-center gap-2 text-sm">
+                <span>🔄</span> إعادة البدء
+            </button>
+            <button onclick="window.print()" class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-black py-3.5 px-8 rounded-2xl shadow-xl transition transform hover:scale-105 flex items-center gap-2 text-base">
+                <span>🖨️</span> طباعة ورقة الأنشطة
+            </button>
+        </div>
+
+        <!-- نافذة التقييم التفاعلية عند التصحيح النهائي -->
+        <div id="resultModal" class="no-print hidden mt-6 p-5 rounded-2xl text-center font-black text-lg transition duration-300"></div>
+
+        <!-- تذييل الصفحة الرسمي -->
+        <footer class="mt-8 text-center text-xs font-extrabold text-indigo-900/60 border-t-2 border-indigo-100 pt-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <span>مدرسة القلم التعليمية الخاصة • أنشطة اللغة العربية التقييمية</span>
+            <span>بإشراف المعلمة: ياسمين الحمادي 🌸</span>
+            <span>جميع الحقوق محفوظة ©</span>
+        </footer>
+    </div>
+
+    <script>
+        // إعداد الصوت كخيارات ومؤثرات خفيفة
+        let audioCtx = null;
+        let isSoundEnabled = true;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) {
+                    audioCtx = new AudioContext();
+                }
+            }
+        }
+
+        function toggleSound() {
+            isSoundEnabled = !isSoundEnabled;
+            const statusEl = document.getElementById('soundStatus');
+            const iconEl = document.getElementById('soundIcon');
+            if (isSoundEnabled) {
+                statusEl.innerText = "الصوت مفعل";
+                iconEl.innerText = "🔊";
+            } else {
+                statusEl.innerText = "الصوت مكتوم";
+                iconEl.innerText = "🔇";
+            }
+        }
+
+        // نغمة النجاح النهائي
+        function playSuccessSound() {
+            if (!isSoundEnabled) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            try {
+                const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                notes.forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.1);
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime + idx * 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.1 + 0.3);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(audioCtx.currentTime + idx * 0.1);
+                    osc.stop(audioCtx.currentTime + idx * 0.1 + 0.3);
+                });
+            } catch (e) {}
+        }
+
+        // نطق الكلمات بالصوت العربي
+        function speakText(text) {
+            if (!('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ar-SA';
+            utterance.rate = 0.85;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // تخزين اختيار لعبة البالونات بدون كشف صحة أو خطأ فورياً
+        const balloonAnswers = {};
+
+        function selectBalloon(groupNum, value, element) {
+            balloonAnswers[groupNum] = value;
+            
+            const container = document.getElementById(`balloonGroup${groupNum}`);
+            const buttons = container.querySelectorAll('.balloon-option');
+            buttons.forEach(btn => {
+                btn.classList.remove('selected');
+            });
+
+            element.classList.add('selected');
+        }
+
+        // مفتاح الإجابات النموذجية لجميع الأنشطة (60 درجة - 30 سؤالاً)
+        const answerKey = {
+            'q1_1': { correct: 'long_a', text: 'مد بالألف' },
+            'q1_2': { correct: 'short', text: 'حركات قصيرة' },
+            'q1_3': { correct: 'long_w', text: 'مد بالواو' },
+
+            'q2_1': { correct: 'right', text: 'قَلَمًا' },
+            'q2_2': { correct: 'right', text: 'وَلَدٌ' },
+            'q2_3': { correct: 'right', text: 'سَمَاءً' },
+
+            'q3_1': { correct: 'right', text: 'ـة (مربوطة)' },
+            'q3_2': { correct: 'right', text: 'ت (مبسوطة)' },
+            'q3_3': { correct: 'right', text: 'ة (مربوطة)' },
+            'q3_4': { correct: 'right', text: 'ت (مبسوطة)' },
+
+            'q4_1': { correct: 'sun', text: 'لام شمسية' },
+            'q4_2': { correct: 'moon', text: 'لام قمرية' },
+            'q4_3': { correct: 'sun', text: 'لام شمسية' },
+
+            'q5_1': { correct: 'to', text: 'إِلَى' },
+            'q5_2': { correct: 'from', text: 'مِنْ' },
+            'q5_3': { correct: 'on', text: 'عَلَى' },
+            'q5_4': { correct: 'in', text: 'فِي' },
+
+            'balloon_1': { correct: 'right', text: 'عُصْفُورٌ' },
+            'balloon_2': { correct: 'right', text: 'فِي المَدْرَسَةِ' },
+            'balloon_3': { correct: 'right', text: 'مَدْرَسَةً' },
+
+            'q7_1': { correct: 'right', text: 'بَــيْــتٌ' },
+            'q7_2': { correct: 'right', text: 'سَــمَــكٌ' },
+            'q7_3': { correct: 'right', text: 'شُــكْــرًا' },
+
+            'q8_1': { correct: 'right', text: 'مَدْ / رَ / سَ / ةٌ' },
+            'q8_2': { correct: 'right', text: 'مَحْ / مُو / دٌ' },
+
+            'q9_1': { correct: 'right', text: 'ـه (هاء)' },
+            'q9_2': { correct: 'right', text: 'ه (هاء)' },
+
+            'q10_1': { correct: 'right', text: 'المَلْعَبِ' },
+            'q10_2': { correct: 'right', text: 'الياء (ي)' },
+            'q10_3': { correct: 'right', text: 'نون أصلية' }
+        };
+
+        // دالة تصحيح الورقة الشاملة واكتشاف الإجابات
+        function calculateGrade() {
+            initAudio();
+            let score = 0;
+            const totalQuestions = 30;
+            const pointsPerQuestion = 2;
+
+            // 1. فحص أسئلة القوائم المنسدلة
+            for (let key in answerKey) {
+                if (key.startsWith('balloon_')) continue;
+
+                const selectEl = document.getElementById(key);
+                const boxEl = document.getElementById(`box_${key}`);
+                const badgeEl = document.getElementById(`badge_${key}`);
+
+                if (!selectEl) continue;
+
+                const userVal = selectEl.value;
+                const correctVal = answerKey[key].correct;
+
+                boxEl.classList.remove('ans-correct', 'ans-wrong');
+
+                if (userVal === correctVal) {
+                    score += pointsPerQuestion;
+                    boxEl.classList.add('ans-correct');
+                    badgeEl.innerHTML = `<span class="text-emerald-700 font-extrabold text-xs">✅ ممتاز!</span>`;
+                } else {
+                    boxEl.classList.add('ans-wrong');
+                    badgeEl.innerHTML = `<span class="text-rose-700 font-extrabold text-xs">❌ الصواب: ${answerKey[key].text}</span>`;
+                }
+            }
+
+            // 2. فحص أسئلة البالونات
+            [1, 2, 3].forEach(num => {
+                const key = `balloon_${num}`;
+                const userVal = balloonAnswers[num];
+                const correctVal = answerKey[key].correct;
+                const boxEl = document.getElementById(`box_balloon_${num}`);
+                const badgeEl = document.getElementById(`badge_balloon_${num}`);
+
+                boxEl.classList.remove('ans-correct', 'ans-wrong');
+
+                if (userVal === correctVal) {
+                    score += pointsPerQuestion;
+                    boxEl.classList.add('ans-correct');
+                    badgeEl.innerHTML = `<span class="text-emerald-700 font-extrabold text-xs">✅ بالون صحيح!</span>`;
+                } else {
+                    boxEl.classList.add('ans-wrong');
+                    badgeEl.innerHTML = `<span class="text-rose-700 font-extrabold text-xs">❌ الصواب: ${answerKey[key].text}</span>`;
+                }
+            });
+
+            // تحديث العرض العلوي للنتيجة
+            document.getElementById('currentScoreDisplay').innerText = score;
+
+            // إظهار التقييم النهائي
+            const resultModal = document.getElementById('resultModal');
+            resultModal.classList.remove('hidden');
+
+            if (score >= 54) {
+                playSuccessSound();
+                resultModal.className = "no-print mt-6 p-5 rounded-2xl text-center font-black text-lg bg-emerald-100 text-emerald-950 border-2 border-emerald-400 shadow-md";
+                resultModal.innerHTML = `🎉 نتيجة مذهلة يا بطل! حصلت على ${score} من 60 (ممتاز مرتفع). نلت وسام الفخار من المعلمة ياسمين الحمادي! 🌟⭐`;
+                speakText(`ممتاز جداً! درجتك هي ${score} من ستين`);
+            } else if (score >= 40) {
+                playSuccessSound();
+                resultModal.className = "no-print mt-6 p-5 rounded-2xl text-center font-black text-lg bg-sky-100 text-sky-950 border-2 border-sky-400 shadow-md";
+                resultModal.innerHTML = `👏 عمل رائع جداً! حصلت على ${score} من 60. تفقد الأجوبة المشار إليها باللون الأحمر لتتعلم منها! 🎈`;
+            } else {
+                resultModal.className = "no-print mt-6 p-5 rounded-2xl text-center font-black text-lg bg-rose-100 text-rose-950 border-2 border-rose-400 shadow-md";
+                resultModal.innerHTML = `💪 حصلت على ${score} من 60. راجع التصحيح المكتوب باللون الأحمر أسفل كل سؤال وحاول مجدداً! ❤️`;
+            }
+
+            // التمرير السلس نحو التقييم
+            resultModal.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // دالة إعادة البدء
+        function resetForm() {
+            document.querySelectorAll('select').forEach(s => s.value = "");
+            document.querySelectorAll('.balloon-option').forEach(b => b.classList.remove('selected'));
+            document.querySelectorAll('[id^="box_"]').forEach(box => box.classList.remove('ans-correct', 'ans-wrong'));
+            document.querySelectorAll('[id^="badge_"]').forEach(b => b.innerHTML = "");
+            document.getElementById('currentScoreDisplay').innerText = "--";
+            document.getElementById('resultModal').classList.add('hidden');
+            for (let member in balloonAnswers) delete balloonAnswers[member];
+        }
+    </script>
+</body>
+</html>
